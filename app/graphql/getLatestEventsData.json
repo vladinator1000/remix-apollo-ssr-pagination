@@ -1,0 +1,39 @@
+{
+  "getLatestEvents": {
+    "__typename": "EventConnection",
+    "edges": [
+      {
+        "__typename": "EventEdge",
+        "node": {
+          "__typename": "Event",
+          "id": "10",
+          "name": "doloribus",
+          "slug": "2ilSrOJH3L9PIYrgzXqBF"
+        }
+      },
+      {
+        "__typename": "EventEdge",
+        "node": {
+          "__typename": "Event",
+          "id": "11",
+          "name": "soluta voluptatum voluptatibus",
+          "slug": "9WdmWbJbcBLiGUbBQDdZe"
+        }
+      },
+      {
+        "__typename": "EventEdge",
+        "node": {
+          "__typename": "Event",
+          "id": "13",
+          "name": "quae dolore porro consectetur",
+          "slug": "nM1FnmJNv5sP-bdSISMkn"
+        }
+      }
+    ],
+    "pageInfo": {
+      "__typename": "PageInfo",
+      "hasNextPage": true,
+      "endCursor": "13"
+    }
+  }
+}

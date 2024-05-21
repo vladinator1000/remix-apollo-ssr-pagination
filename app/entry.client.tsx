@@ -4,15 +4,20 @@
  * For more information, see https://remix.run/file-conventions/entry.client
  */
 
+import { ApolloProvider } from "@apollo/client/index.js";
 import { RemixBrowser } from "@remix-run/react";
 import { startTransition, StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
+
+import { graphqlClient } from "./graphql/apollo.client";
 
 startTransition(() => {
   hydrateRoot(
     document,
     <StrictMode>
-      <RemixBrowser />
+      <ApolloProvider client={graphqlClient}>
+        <RemixBrowser />
+      </ApolloProvider>
     </StrictMode>
   );
 });

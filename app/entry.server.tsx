@@ -6,8 +6,12 @@
 
 import type { AppLoadContext, EntryContext } from "@remix-run/cloudflare";
 import { RemixServer } from "@remix-run/react";
-import { isbot } from "isbot";
-import { renderToReadableStream } from "react-dom/server";
+import { renderToString } from "react-dom/server";
+import { ApolloProvider } from "@apollo/client/index.js";
+import { getDataFromTree } from "@apollo/client/react/ssr/index.js";
+
+import { createGraphqlClientServer } from "./graphql/apollo.server";
+import { ApolloStateContext } from "./graphql/apolloStateContext";
 
 export default async function handleRequest(
   request: Request,
@@ -19,24 +23,30 @@ export default async function handleRequest(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   loadContext: AppLoadContext
 ) {
-  const body = await renderToReadableStream(
-    <RemixServer context={remixContext} url={request.url} />,
-    {
-      signal: request.signal,
-      onError(error: unknown) {
-        // Log streaming rendering errors from inside the shell
-        console.error(error);
-        responseStatusCode = 500;
-      },
-    }
+  let gqlClient = createGraphqlClientServer(loadContext)
+
+  let app = (
+    <ApolloProvider client={gqlClient}>
+      <RemixServer context={remixContext} url={request.url} />
+    </ApolloProvider>
+  )
+
+  await getDataFromTree(app)
+  let gqlState = gqlClient.extract()
+
+  app = (
+    <ApolloStateContext.Provider value={gqlState}>
+      {app}
+    </ApolloStateContext.Provider>
+  )
+
+  let html = renderToString(
+    app,
   );
 
-  if (isbot(request.headers.get("user-agent") || "")) {
-    await body.allReady;
-  }
 
   responseHeaders.set("Content-Type", "text/html");
-  return new Response(body, {
+  return new Response(html, {
     headers: responseHeaders,
     status: responseStatusCode,
   });
